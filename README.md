@@ -1,3 +1,5 @@
+Documentaçao word - <a>https://onedrive.live.com/edit.aspx?resid=98AB40DA42F0F36D!s8b798d049bb74c63923a138e5bb16bfe&migratedtospo=true&wdPid=4ef24139</a>
+
 Resumo do Projeto: Aktie (VE Charging Share)
 Título
 Aktie: Partilha Inteligente de Carregadores de Veículos Elétricos (Projeto de Aptidão Profissional - PAP)
