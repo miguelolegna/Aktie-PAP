@@ -3,7 +3,7 @@ Apresentação Canva - <a>https://www.canva.com/design/DAG1YS--c9M/YzNyTrbd78JQg
 
 Resumo do Projeto: Aktie (VE Charging Share) <br>
 Título <br>
-Aktie: Partilha Inteligente de Carregadores de Veículos Elétricos (Projeto de Aptidão Profissional - PAP)
+Aktie: Aplicação Inteligente de Partilha de carregadores elétricos
 
 Descrição Curta (GitHub Readme & Pitch)
 Aktie é uma aplicação móvel inovadora desenvolvida no âmbito de um Projeto de Aptidão Profissional (PAP), com o objetivo de resolver o crescente desafio da mobilidade elétrica: a escassez de postos de carregamento públicos e os seus custos elevados.
