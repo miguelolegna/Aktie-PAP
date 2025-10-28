@@ -5,25 +5,25 @@ Resumo do Projeto: Aktie (VE Charging Share) <br>
 <b>Título</b> <br>
 Aktie: Aplicação Inteligente de Partilha de carregadores elétricos
 
-Descrição Curta (GitHub Readme & Pitch)
+<b>Descrição</b>: <br>
 Aktie é uma aplicação móvel inovadora desenvolvida no âmbito de um Projeto de Aptidão Profissional (PAP), com o objetivo de resolver o crescente desafio da mobilidade elétrica: a escassez de postos de carregamento públicos e os seus custos elevados.
 
 A plataforma conecta proprietários de carregadores de VE domésticos com utilizadores na sua área, permitindo que os proprietários partilhem a sua infraestrutura e os utilizadores acedam a uma rede de carregamento mais acessível, descentralizada e disponível. Este projeto demonstra a capacidade de planear e executar uma solução Full-Stack moderna para um problema real de mercado.
 
-Tecnologias-Chave
-Frontend: React Native (com TypeScript) para uma experiência cross-platform nativa em iOS e Android.
+<b>Tecnologias-Chave</b> <br>
+<b>Frontend</b>: React Native (com TypeScript) para uma experiência cross-platform nativa em iOS e Android.
 
-Backend & Lógica: Uma API RESTful em Python (Flask/Django) para gerir a lógica complexa de validação de reservas e cálculo de custos.
+<b>Backend & Lógica</b>: Uma API RESTful em Python (Flask/Django) para gerir a lógica complexa de validação de reservas e cálculo de custos.
 
-Base de Dados & Auth: Firebase (Firestore e Authentication) para escalabilidade rápida, gestão de dados em tempo real e autenticação segura de utilizadores.
+<b>Base de Dados & Auth</b>: Firebase (Firestore e Authentication) para escalabilidade rápida, gestão de dados em tempo real e autenticação segura de utilizadores.
 
-Funções Principais
-Mapeamento e Geolocalização: Encontrar carregadores disponíveis na proximidade.
+<b>Funções Principais<</b>: <br>
+<b>Mapeamento e Geolocalização</b>: Encontrar carregadores disponíveis na proximidade.
 
-Agendamento: Sistema de reserva para garantir o slot de carregamento.
+<b>Agendamento</b>: Sistema de reserva para garantir o slot de carregamento.
 
-Gestão de Recursos: CRUD completo para proprietários listarem e gerirem a disponibilidade dos seus carregadores.
+<b>Gestão de Recursos</b>: CRUD completo para proprietários listarem e gerirem a disponibilidade dos seus carregadores.
 
-Sistema de Custo: Cálculo preciso do custo de carregamento por sessão.
+<b>Sistema de Custo</b>: Cálculo preciso do custo de carregamento por sessão.
 
-Aktie visa promover uma comunidade de partilha, tornando o uso de veículos elétricos mais prático e económico para todos.
+<b>Aktie visa promover uma comunidade de partilha, tornando o uso de veículos elétricos mais prático e económico para todos.</b>
