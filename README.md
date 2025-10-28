@@ -2,7 +2,7 @@ Documentaçao word - <a>https://onedrive.live.com/edit.aspx?resid=98AB40DA42F0F3
 Apresentação Canva - <a>https://www.canva.com/design/DAG1YS--c9M/YzNyTrbd78JQgYZAm8Tkiw/edit?utm_content=DAG1YS--c9M&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton </a>
 
 Resumo do Projeto: Aktie (VE Charging Share) <br>
-Título <br>
+<b>Título<b> <br>
 Aktie: Aplicação Inteligente de Partilha de carregadores elétricos
 
 Descrição Curta (GitHub Readme & Pitch)
