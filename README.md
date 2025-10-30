@@ -1,4 +1,4 @@
-Documentaçao word - <a>https://onedrive.live.com/edit.aspx?resid=98AB40DA42F0F36D!s8b798d049bb74c63923a138e5bb16bfe&migratedtospo=true&wdPid=4ef24139</a> <br>
+Documentaçao word - <a>https://1drv.ms/w/c/98ab40da42f0f36d/EQSNeYu3m2NMkjoTjluxa_4BnfrUI6cfOx8zW5wPGk02jw?e=lrraep</a> <br>
 Apresentação Canva - <a>https://www.canva.com/design/DAG1YS--c9M/YzNyTrbd78JQgYZAm8Tkiw/edit?utm_content=DAG1YS--c9M&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton </a>
 
 Resumo do Projeto: Aktie (VE Charging Share) <br>
