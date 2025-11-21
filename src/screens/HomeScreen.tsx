@@ -1,39 +1,40 @@
-// src/screens/HomeScreen.tsx
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { GlobalStyles, Colors } from '../styles/GlobalStyles';
 
-const HomeScreen = () => {
+const HomeScreen: React.FC = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Aktie - Início</Text>
-      <Text style={styles.subtitle}>Bem-vindo ao seu projeto de PAP!</Text>
-      <Text style={styles.text}>Aqui será a área para visualizar as suas ações.</Text>
+    <View style={GlobalStyles.container}>
+      <Text style={[GlobalStyles.title, styles.greeting]}>
+        Bem-vindo à Aktie! 🌍
+      </Text>
+      <Text style={GlobalStyles.text}>
+        O mapa e as funcionalidades principais aparecerão aqui.
+      </Text>
+      <View style={styles.card}>
+        <Text style={styles.cardText}>
+          Encontre carregadores de VE próximos.
+        </Text>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f0f4f8', // Um fundo claro
-    alignItems: 'center',
-    justifyContent: 'center',
+  greeting: {
+    marginBottom: 20,
+    color: Colors.primary,
+  },
+  card: {
+    marginTop: 40,
     padding: 20,
+    backgroundColor: Colors.dark,
+    borderRadius: 8,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#1a3a5b', // Cor escura para o título
-    marginBottom: 10,
-  },
-  subtitle: {
+  cardText: {
+    color: Colors.white,
     fontSize: 18,
-    color: '#555',
-    marginBottom: 30,
-  },
-  text: {
-    fontSize: 16,
-    color: '#777',
+    fontWeight: '600',
   }
 });
 
