@@ -1,8 +1,9 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+// 1. Novos imports necessários para a persistência
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
-// O Expo injeta automaticamente as vars que começam por EXPO_PUBLIC_
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -12,8 +13,15 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID
 };
 
-export const app = initializeApp(firebaseConfig); 
-export const db = getFirestore(app);
-export const auth = getAuth(app); 
+// Inicializa a App
+export const app = initializeApp(firebaseConfig);
 
-console.log("[Firebase] Config carregada para o projeto:", firebaseConfig.projectId);
+// Inicializa a DB
+export const db = getFirestore(app);
+
+// 2. Inicializa a Auth COM persistência (Correção do Aviso)
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+});
+
+console.log("[Firebase] Config carregada com Persistência AsyncStorage");

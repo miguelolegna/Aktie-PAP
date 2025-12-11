@@ -1,100 +1,153 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, FlatList, StyleSheet } from 'react-native';
-// Importa a instância da DB configurada
-import { db } from '../config/firebaseConfig'; 
+import { View, Text, ActivityIndicator, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebaseConfig';
+// 1. Importar o Contexto e as Cores
+import { useAuth } from '../context/AuthContext';
+import { Colors } from '../styles/GlobalStyles';
 
 const HomeScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [chargers, setChargers] = useState<any[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  
+  // 2. Usar o hook de Logout
+  const { logout } = useAuth();
 
   useEffect(() => {
-    const testConnection = async () => {
+    const fetchChargers = async () => {
       try {
-        console.log("--- A TENTAR LIGAR AO FIRESTORE ---");
-        
-        // 1. Tenta ler a coleção 'chargers'
         const querySnapshot = await getDocs(collection(db, "chargers"));
-        
         const data: any[] = [];
         querySnapshot.forEach((doc) => {
-          // Extrai os dados e adiciona o ID
           data.push({ id: doc.id, ...doc.data() });
         });
-
-        console.log(`[SUCESSO] Encontrados ${data.length} carregadores.`);
         setChargers(data);
       } catch (err: any) {
-        console.error("[ERRO CRÍTICO] Falha na conexão:", err);
-        setError(err.message);
+        console.error("Erro:", err);
+        Alert.alert("Erro", "Falha ao carregar dados.");
       } finally {
         setLoading(false);
       }
     };
 
-    testConnection();
+    fetchChargers();
   }, []);
+
+  // Função auxiliar para confirmar o logout
+  const handleLogout = () => {
+    Alert.alert(
+      "Sair",
+      "Tens a certeza que queres sair da conta?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { 
+          text: "Sair", 
+          style: "destructive", 
+          onPress: () => logout() // <--- ISTO TROCA O ECRÃ AUTOMATICAMENTE
+        }
+      ]
+    );
+  };
 
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>A testar conexão...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.center}>
-        <Text style={{ color: 'red', fontWeight: 'bold' }}>Erro de Conexão:</Text>
-        <Text>{error}</Text>
-        <Text style={{ marginTop: 10, fontSize: 12 }}>
-          Verifica se o .env está correto e se reiniciaste o servidor com --clear.
-        </Text>
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Teste de Conexão DB</Text>
-      <Text style={styles.subtitle}>Carregadores encontrados: {chargers.length}</Text>
+      
+      {/* CABEÇALHO PERSONALIZADO */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.title}>Olá, Condutor</Text>
+          <Text style={styles.subtitle}>{chargers.length} postos disponíveis</Text>
+        </View>
+        
+        {/* BOTÃO DE LOGOUT */}
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Sair</Text>
+        </TouchableOpacity>
+      </View>
 
       <FlatList
         data={chargers}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>{item.morada || "Sem morada"}</Text>
-            <Text>Potência: {item.potencia_kw} kW</Text>
-            <Text>Tipo: {item.tipo_tomada}</Text>
-            <Text style={{ fontSize: 10, color: '#666', marginTop: 5 }}>ID: {item.id}</Text>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>{item.morada || "Sem morada"}</Text>
+              <View style={item.is_active ? styles.badgeActive : styles.badgeInactive} />
+            </View>
+            
+            <Text style={styles.cardInfo}>Potência: {item.potencia_kw} kW • {item.tipo_tomada}</Text>
+            <Text style={styles.cardPrice}>{item.preco_kwh} €/kWh</Text>
           </View>
         )}
+        contentContainerStyle={{ paddingBottom: 20 }}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, paddingTop: 50, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, backgroundColor: '#f8f9fa', paddingTop: 50 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
-  subtitle: { fontSize: 16, marginBottom: 20, color: 'green' },
+  
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  title: { fontSize: 24, fontWeight: 'bold', color: Colors.dark },
+  subtitle: { fontSize: 14, color: Colors.primary },
+  
+  logoutButton: {
+    backgroundColor: '#ffebee', // Fundo vermelho muito claro
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.danger
+  },
+  logoutText: {
+    color: Colors.danger,
+    fontWeight: 'bold',
+    fontSize: 14
+  },
+
+  // Cards
   card: {
-    backgroundColor: 'white',
+    backgroundColor: Colors.white,
+    marginHorizontal: 20,
+    marginBottom: 15,
     padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    borderRadius: 12,
+    // Sombra
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  cardTitle: { fontWeight: 'bold', fontSize: 16, marginBottom: 5 }
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5
+  },
+  cardTitle: { fontWeight: 'bold', fontSize: 16, color: Colors.dark, flex: 1 },
+  cardInfo: { fontSize: 14, color: '#666', marginBottom: 5 },
+  cardPrice: { fontSize: 16, fontWeight: 'bold', color: Colors.primary },
+
+  // Indicador de Status
+  badgeActive: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#28a745' },
+  badgeInactive: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#dc3545' }
 });
 
 export default HomeScreen;
