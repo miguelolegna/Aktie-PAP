@@ -1,3 +1,4 @@
+// src/screens/SplashScreen.tsx
 import React, { useEffect } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native'; // Importar 'Image' e 'StyleSheet'
 import { GlobalStyles, Colors } from '../styles/GlobalStyles';
@@ -48,6 +49,3 @@ const styles = StyleSheet.create({
 });
 
 export default SplashScreen;
-
-
-//
