@@ -1,15 +1,15 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/auth';
-// Nota: getAuth já deve estar exportado do teu firebaseConfig ou importado diretamente
-import { getAuth } from 'firebase/auth'; 
-import { app } from '../config/firebaseConfig'; // Ajusta se necessário
-
-// Inicializa Auth
-const auth = getAuth(app);
+// src/context/AuthContext.tsx
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { onAuthStateChanged, User, deleteUser, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { doc, setDoc, Timestamp } from 'firebase/firestore';
+// Importação agora garantida pelas constantes exportadas
+import { auth, db } from '../config/firebaseConfig';
 
 interface AuthContextData {
   user: User | null;
   loading: boolean;
+  login: (email: string, pass: string) => Promise<void>;
+  register: (email: string, pass: string, nome: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -20,26 +20,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Ouve alterações no estado de autenticação (Login/Logout/Recarga)
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
     });
-
-    return unsubscribe; // Limpa o ouvinte quando o componente desmonta
+    return () => unsubscribe();
   }, []);
 
-  const logout = async () => {
-    await firebaseSignOut(auth);
+  const login = async (email: string, pass: string) => {
+    await signInWithEmailAndPassword(auth, email, pass);
   };
 
-  return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+  const register = async (email: string, pass: string, nome: string) => {
+    let userCredential;
+    try {
+      userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      const newUser = userCredential.user;
+
+      // Escrita atómica no Firestore para evitar utilizadores sem perfil
+      await setDoc(doc(db, "users", newUser.uid), {
+        nome: nome,
+        email: email,
+        telefone: "",
+        rating_medio: 0,
+        data_registo: Timestamp.now(),
+        is_verified: false,
+        fcm_token: ""
+      });
+    } catch (error) {
+      // Rollback preventivo
+      if (userCredential?.user) {
+        await deleteUser(userCredential.user);
+      }
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    await signOut(auth);
+  };
+
+return (
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Hook personalizado para usar o contexto facilmente
 export const useAuth = () => useContext(AuthContext);
-export { auth }; // Exporta o auth para usar nos ecrãs de login/registo

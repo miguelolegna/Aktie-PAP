@@ -1,42 +1,65 @@
+// src/styles/GlobalStyles.ts
 import { StyleSheet } from 'react-native';
 
 export const Colors = {
-  primary: '#99AA38', // Verde Azeitona (Tua marca)
-  dark: '#262623',    // Preto Suave (Texto)
+  // --- A TUA MARCA (Teal Energy) ---
+  primary: '#00BFA5',      // Cor Principal (Botões, Tabs Ativas, Links)
+  primaryDark: '#008F7A',  // Estado "Pressionado" ou Títulos Fortes
+  primaryLight: '#E0F2F1', // Fundo subtil (Badge, Fundo de ícone)
+
+  // --- NEUTROS (Blue Grey - Mais moderno que preto puro) ---
+  dark: '#263238',         // Texto Principal (Títulos)
+  gray: '#78909C',         // Texto Secundário (Descrições, Placeholders)
+  border: '#CFD8DC',       // Bordas de inputs e divisórias
   white: '#FFFFFF',
+  background: '#F5F7FA',   // Fundo dos ecrãs (Não é branco puro, cansa menos a vista)
   
-  // Adiciona estas para a UI funcionar bem:
-  gray: '#999999',       // Placeholders
-  lightGray: '#F5F5F5',  // Fundo de inputs
-  border: '#E0E0E0',     // Bordas subtis
-  danger: '#DC3545',     // Erros (Vermelho padrão)
-  link: '#007AFF'        // Links clicáveis (opcional)
+  // --- FEEDBACK ---
+  success: '#00BFA5',      // O próprio Teal serve de sucesso
+  danger: '#FF5252',       // Vermelho vibrante (Erros, Apagar, Sair)
+  dangerLight: '#FFEBEE',  // Fundo do botão de erro/sair
+  warning: '#FFAB40',      // Laranja para alertas (Atenção)
+  
+  // --- SOMBRAS ---
+  shadow: '#000000',       // Cor base para sombras
 };
 
 export const GlobalStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
-    // Removi alignItems/justifyContent para não estragar layouts complexos
+    backgroundColor: Colors.background, // Usa o novo fundo off-white
   },
   title: {
-    fontSize: 32,
+    fontSize: 28, // Ajustei ligeiramente para mobile
     fontWeight: 'bold',
-    color: Colors.primary, // Usa a cor da marca
+    color: Colors.dark, // Títulos em Dark Blue Grey leem-se melhor
     marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: Colors.gray,
+    marginBottom: 20,
   },
   text: {
     fontSize: 16,
     color: Colors.dark,
+    lineHeight: 24, // Melhora a leitura de parágrafos
   },
-  // Podes adicionar um estilo base para inputs aqui se quiseres padronizar
   input: {
-    backgroundColor: Colors.lightGray,
+    backgroundColor: Colors.white,
     borderColor: Colors.border,
     borderWidth: 1,
     borderRadius: 12,
     padding: 15,
     fontSize: 16,
     color: Colors.dark,
+  },
+  // Classe utilitária para sombras suaves (podes usar em Cards)
+  shadow: {
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1, // Sombra suave
+    shadowRadius: 8,
+    elevation: 4, // Android
   }
 });

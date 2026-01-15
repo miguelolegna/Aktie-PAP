@@ -1,3 +1,4 @@
+// scripts/seed.ts
 import * as admin from 'firebase-admin';
 import { createRequire } from 'module'; // Necessário para ler JSON em ESM
 

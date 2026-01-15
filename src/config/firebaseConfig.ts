@@ -1,8 +1,14 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-// 1. Novos imports necessários para a persistência
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
+import { 
+  initializeAuth, 
+  getAuth, 
+  Auth, 
+  // @ts-ignore - Força a resolução se o TS local falhar no mapeamento
+  getReactNativePersistence 
+} from 'firebase/auth'; 
+import { getFirestore, Firestore } from 'firebase/firestore';
+import { getStorage, FirebaseStorage } from 'firebase/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -13,15 +19,16 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID
 };
 
-// Inicializa a App
-export const app = initializeApp(firebaseConfig);
+// Inicialização da App
+const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// Inicializa a DB
-export const db = getFirestore(app);
+/**
+ * EXPORTAÇÕES DIRETAS (Solução para ts(2305) e ts(2459))
+ * Exportar como 'const' garante visibilidade global no projeto.
+ */
+export const auth: Auth = getApps().length === 0 
+  ? initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) }) 
+  : getAuth(app);
 
-// 2. Inicializa a Auth COM persistência (Correção do Aviso)
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
-
-console.log("[Firebase] Config carregada com Persistência AsyncStorage");
+export const db: Firestore = getFirestore(app);
+export const storage: FirebaseStorage = getStorage(app);
