@@ -1,3 +1,4 @@
+// src/screens/HomeScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
@@ -36,7 +37,7 @@ const HomeScreen: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
-    Alert.alert("Sair", "Tens a certeza?", [
+    Alert.alert("Sair", "Tem a certeza?", [
       { text: "Cancelar", style: "cancel" },
       { text: "Sair", style: "destructive", onPress: logout }
     ]);

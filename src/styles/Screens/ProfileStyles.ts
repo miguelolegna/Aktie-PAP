@@ -1,44 +1,102 @@
+// src/styles/Screens/ProfileStyles.ts
 import { StyleSheet } from 'react-native';
-import { Colors } from '../GlobalStyles';
+import { Colors, Metrics } from '../GlobalStyles';
 
 export const ProfileStyles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.background,
+    padding: Metrics.padding,
+    paddingBottom: 110, 
+  },
+  centered: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.background,
-    padding: 20
+    padding: Metrics.padding,
   },
-  headerText: {
-    fontSize: 18,
+  header: {
+    alignItems: 'center',
+    marginVertical: 30,
+  },
+  avatarPlaceholder: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.primaryLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  avatarLetter: {
+    fontSize: 32,
     fontWeight: 'bold',
-    color: Colors.white,
-    marginBottom: 20
+    color: Colors.primaryDark,
   },
-  placeholderText: {
-    fontSize: 16,
+  name: {
+    color: Colors.dark,
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  email: {
+    color: Colors.gray,
+    fontSize: 14,
+    marginTop: 4,
+  },
+  guestTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: Colors.dark,
+    marginTop: 10,
+  },
+  guestSubtitle: {
+    fontSize: 14,
     color: Colors.gray,
     textAlign: 'center',
+    marginTop: 10,
+    lineHeight: 20,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 30,
   },
-  actionButton: {
-    backgroundColor: Colors.primary,
-    width: '100%',
-    paddingVertical: 15,
-    borderRadius: 12,
+  statBox: {
+    backgroundColor: Colors.white,
+    padding: 15,
+    borderRadius: Metrics.radius,
     alignItems: 'center',
-    marginBottom: 10
+    width: '48%',
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
-  authButton: {
-    backgroundColor: '#4CAF50', // Verde de destaque para registo
-    width: '100%',
-    paddingVertical: 15,
-    borderRadius: 12,
-    alignItems: 'center'
+  statLabel: {
+    color: Colors.gray,
+    fontSize: 11,
+    textTransform: 'uppercase',
+    marginBottom: 5,
+  },
+  statValue: {
+    color: Colors.primary,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  primaryButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 16,
+    borderRadius: Metrics.radius,
+    alignItems: 'center',
+    marginTop: 'auto',
+    marginBottom: 12,
   },
   logoutButton: {
-    backgroundColor: '#FF3B30',
-    marginTop: 20
+    backgroundColor: Colors.dangerLight,
+    borderWidth: 1,
+    borderColor: Colors.danger,
+    paddingVertical: 16,
+    borderRadius: Metrics.radius,
+    alignItems: 'center',
   },
   buttonText: {
     color: Colors.white,

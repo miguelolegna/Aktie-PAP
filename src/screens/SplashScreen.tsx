@@ -18,6 +18,7 @@ const SmartSplashScreen: React.FC<SmartSplashScreenProps> = ({ isLoading, onFini
   // 1. Configurar o Player com a nova API
   const player = useVideoPlayer(require('../../assets/Animação_com_Ficha_na_Ponta.mp4'), (player) => {
     player.loop = false;
+    player.muted = true;
     player.play();
   });
 

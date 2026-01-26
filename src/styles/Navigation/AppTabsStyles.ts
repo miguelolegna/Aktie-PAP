@@ -2,85 +2,68 @@ import { StyleSheet, Dimensions } from 'react-native';
 import { Colors } from '../GlobalStyles';
 
 const { width } = Dimensions.get('window');
-
 const MARGIN_H = 16; 
 const BAR_WIDTH = width - (MARGIN_H * 2); 
 export const TAB_WIDTH = BAR_WIDTH / 4; 
-
-// VOLTEI PARA 60 (O tamanho da "bola inicial" que gostavas)
-const CIRCLE_SIZE = 60; 
+export const CIRCLE_SIZE = 60; 
 
 export const AppTabsStyles = StyleSheet.create({
-  screenCenter: {
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center',
-    backgroundColor: Colors.background
-  },
-  
   tabBarContainer: {
     flexDirection: 'row',
     position: 'absolute',
-    bottom: 20, 
+    bottom: 25, 
     width: BAR_WIDTH, 
     alignSelf: 'center', 
-    height: 70, 
+    height: 75, 
     backgroundColor: Colors.white,
     borderRadius: 35, 
+    zIndex: 1000, 
+    elevation: 15, 
     shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
   },
-
-  bubble: {
+  travelerContainer: {
     position: 'absolute',
+    width: TAB_WIDTH,
+    height: CIRCLE_SIZE,
+    top: -14, 
+    left: 0, 
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: -1, 
+  },
+  bubble: {
     width: CIRCLE_SIZE, 
     height: CIRCLE_SIZE,
     borderRadius: CIRCLE_SIZE / 2,
     backgroundColor: Colors.primary,
-    
-    // Ajuste de posição para o tamanho 60
-    top: -15, 
-    left: (TAB_WIDTH - CIRCLE_SIZE) / 2, 
-    
     borderWidth: 4, 
-    borderColor: Colors.background, 
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
+    borderColor: Colors.background,
   },
-
   iconsContainer: {
     flexDirection: 'row',
     flex: 1,
+    zIndex: 1001,
   },
-
   tabButton: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-end', 
-    paddingBottom: 10,
+    justifyContent: 'flex-start', 
+    height: '100%',
+    paddingTop: 12,
   },
-
   iconWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 40, 
-    height: 40,
-    marginBottom: 2,
+    width: 30,
+    height: 30,
   },
-
-  iconWrapperActive: {
-    // Vazio (gerido pela animação)
-  },
-
   label: {
-    fontSize: 10,
-    fontWeight: '600',
-    marginBottom: 4,
+    fontSize: 11,
+    fontWeight: '700',
+    position: 'absolute',
+    bottom: 11,
   }
 });

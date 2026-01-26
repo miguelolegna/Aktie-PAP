@@ -1,3 +1,4 @@
+// src/screens/ChargerDetailsScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { doc, getDoc } from 'firebase/firestore';

@@ -1,15 +1,28 @@
+// src/screens/AddChargerScreen.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  ScrollView, 
+  Alert, 
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform 
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context'; // Correção de depreciação
 import { useAuth } from '../context/AuthContext';
-import { createCharger, ChargerFormData } from '../services/ChargerService';
-import { addChargerStyles as styles } from '../styles/Screens/AddChargerStyles';
+import { createCharger, fetchAddressSuggestions } from '../services/ChargerService';
+import { AddChargerStyles as styles } from '../styles/Screens/AddChargerStyles';
 import { Colors } from '../styles/GlobalStyles';
 
 const AddChargerScreen = ({ navigation }: any) => {
-  const { user } = useAuth(); // Pegar o ID do utilizador logado
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [selectedCoords, setSelectedCoords] = useState<{lat: number, lng: number} | null>(null);
 
-  // Estados do Formulário
   const [form, setForm] = useState({
     morada: '',
     potencia: '',
@@ -20,17 +33,30 @@ const AddChargerScreen = ({ navigation }: any) => {
     info: ''
   });
 
+  const handleSearchAddress = async (text: string) => {
+    setForm({ ...form, morada: text });
+    if (text.length > 5) {
+      const res = await fetchAddressSuggestions(text);
+      setSuggestions(res);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const selectAddress = (item: any) => {
+    setForm({ ...form, morada: item.label });
+    setSelectedCoords({ lat: item.lat, lng: item.lng });
+    setSuggestions([]);
+  };
+
   const handleSubmit = async () => {
-    // 1. Validação Básica
-    if (!form.morada || !form.potencia || !form.preco) {
-      Alert.alert("Erro", "Preenche os campos obrigatórios.");
+    if (!selectedCoords) {
+      Alert.alert("Erro", "Seleciona uma localização da lista sugerida.");
       return;
     }
 
     setLoading(true);
-
-    // 2. Preparar dados
-    const dataToSend: ChargerFormData = {
+    const result = await createCharger({
       morada: form.morada,
       potencia_kw: form.potencia,
       preco_kwh: form.preco,
@@ -38,101 +64,107 @@ const AddChargerScreen = ({ navigation }: any) => {
       location_type: form.local as "Indoor" | "Outdoor",
       connection_type: form.cabo as "Socket" | "Tethered",
       access_info: form.info,
-      owner_uid: user?.uid || "anonimo"
-    };
-
-    // 3. Chamar o Service
-    const result = await createCharger(dataToSend);
+      owner_uid: user?.uid || "anonimo",
+      manualLat: selectedCoords.lat,
+      manualLng: selectedCoords.lng,
+    });
 
     setLoading(false);
     if (result.success) {
-      Alert.alert("Sucesso", "Carregador criado!");
+      Alert.alert("Sucesso", "Carregador registado.");
       navigation.goBack();
     } else {
-      Alert.alert("Erro", "Falha ao criar carregador.");
+      Alert.alert("Erro", "Falha no registo.");
     }
   };
 
-  // Componente Auxiliar para Botões de Escolha
-  const Option = ({ label, value, current, field }: any) => (
+  const Selector = ({ label, value, current, field }: any) => (
     <TouchableOpacity 
       style={[styles.optionButton, current === value && styles.optionSelected]}
-      onPress={() => setForm({...form, [field]: value})}
+      onPress={() => setForm({ ...form, [field]: value })}
     >
       <Text style={[styles.optionText, current === value && styles.optionTextSelected]}>{label}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Novo Carregador</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+          <Text style={styles.title}>Novo Carregador Aktie</Text>
 
-        <Text style={styles.label}>Morada / Localização *</Text>
-        <TextInput 
-          style={styles.input} 
-          placeholder="Ex: Garagem Rua das Flores, 12" 
-          value={form.morada}
-          onChangeText={t => setForm({...form, morada: t})}
-        />
+          <Text style={styles.label}>Morada / Localização *</Text>
+          <TextInput 
+            style={styles.input} 
+            placeholder="Procure a morada exata..." 
+            value={form.morada}
+            onChangeText={handleSearchAddress}
+            placeholderTextColor={Colors.gray}
+          />
 
-        <View style={styles.row}>
-          <View style={{flex: 1}}>
-            <Text style={styles.label}>Potência (kW) *</Text>
-            <TextInput 
-              style={styles.input} 
-              placeholder="Ex: 11" 
-              keyboardType="numeric"
-              value={form.potencia}
-              onChangeText={t => setForm({...form, potencia: t})}
-            />
+          {suggestions.length > 0 && (
+            <View style={styles.suggestionsContainer}>
+              {suggestions.map((item, index) => (
+                <TouchableOpacity key={index} style={styles.suggestionItem} onPress={() => selectAddress(item)}>
+                  <Text style={styles.suggestionText} numberOfLines={1}>{item.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
+          {selectedCoords && (
+            <Text style={{ color: Colors.success, fontSize: 12, marginTop: 5, fontWeight: 'bold' }}>
+              ✓ Pin georreferenciado com sucesso.
+            </Text>
+          )}
+
+          <View style={styles.row}>
+            <View style={{ flex: 1, marginRight: 8 }}>
+              <Text style={styles.label}>Potência (kW) *</Text>
+              <TextInput style={styles.input} keyboardType="numeric" value={form.potencia} onChangeText={(t) => setForm({ ...form, potencia: t })} />
+            </View>
+            <View style={{ flex: 1, marginLeft: 8 }}>
+              <Text style={styles.label}>Preço (€/kWh) *</Text>
+              <TextInput style={styles.input} keyboardType="numeric" value={form.preco} onChangeText={(t)=> setForm({ ...form, preco: t })} />
+            </View>
           </View>
-          <View style={{flex: 1}}>
-            <Text style={styles.label}>Preço (€/kWh) *</Text>
-            <TextInput 
-              style={styles.input} 
-              placeholder="Ex: 0.25" 
-              keyboardType="numeric"
-              value={form.preco}
-              onChangeText={t => setForm({...form, preco: t})}
-            />
+
+          <Text style={styles.label}>Tipo de Tomada</Text>
+          <View style={styles.row}>
+            <Selector label="Type 2" value="Type 2" current={form.tipoTomada} field="tipoTomada" />
+            <Selector label="CCS2" value="CCS2" current={form.tipoTomada} field="tipoTomada" />
           </View>
-        </View>
 
-        <Text style={styles.label}>Tipo de Tomada</Text>
-        <View style={styles.row}>
-          <Option label="Type 2" value="Type 2" current={form.tipoTomada} field="tipoTomada" />
-          <Option label="CCS2" value="CCS2" current={form.tipoTomada} field="tipoTomada" />
-        </View>
+          <Text style={styles.label}>Ambiente</Text>
+          <View style={styles.row}>
+            <Selector label="Interior" value="Indoor" current={form.local} field="local" />
+            <Selector label="Exterior" value="Outdoor" current={form.local} field="local" />
+          </View>
 
-        <Text style={styles.label}>Local de Instalação</Text>
-        <View style={styles.row}>
-          <Option label="Interior (Garagem)" value="Indoor" current={form.local} field="local" />
-          <Option label="Exterior" value="Outdoor" current={form.local} field="local" />
-        </View>
+          <Text style={styles.label}>Cabo</Text>
+          <View style={styles.row}>
+            <Selector label="Tomada" value="Socket" current={form.cabo} field="cabo" />
+            <Selector label="Preso" value="Tethered" current={form.cabo} field="cabo" />
+          </View>
 
-        <Text style={styles.label}>Cabo</Text>
-        <View style={styles.row}>
-          <Option label="Tomada (Traga cabo)" value="Socket" current={form.cabo} field="cabo" />
-          <Option label="Cabo incluído" value="Tethered" current={form.cabo} field="cabo" />
-        </View>
+          <Text style={styles.label}>Instruções de Acesso</Text>
+          <TextInput 
+            style={[styles.input, { height: 80 }]} 
+            placeholder="Ex: Código do portão..." 
+            multiline 
+            value={form.info} 
+            onChangeText={(t) => setForm({ ...form, info: t })} 
+          />
 
-        <Text style={styles.label}>Informações de Acesso</Text>
-        <TextInput 
-          style={[styles.input, styles.textArea]} 
-          placeholder="Ex: Código do portão é 1234. Ligue quando chegar."
-          multiline
-          numberOfLines={4}
-          value={form.info}
-          onChangeText={t => setForm({...form, info: t})}
-        />
-
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={loading}>
-          {loading ? <ActivityIndicator color="#fff"/> : <Text style={styles.submitText}>Registar Carregador</Text>}
-        </TouchableOpacity>
-
-      </ScrollView>
-    </View>
+          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={loading}>
+            {loading ? <ActivityIndicator color={Colors.white} /> : <Text style={styles.submitText}>REGISTAR</Text>}
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

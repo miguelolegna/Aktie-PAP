@@ -1,12 +1,14 @@
+// src/config/firebaseConfig.ts
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { 
   initializeAuth, 
-  // @ts-ignore - O TS não vê este membro no perfil Web, mas ele existe no RN
-  getReactNativePersistence,
-  Auth 
+  getAuth, 
+  Auth,
+  Persistence 
 } from 'firebase/auth'; 
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { getReactNativePersistence } from 'firebase/auth/react-native'; 
+import { getFirestore, Firestore } from 'firebase/firestore';
+import { getStorage, FirebaseStorage } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
@@ -19,14 +21,15 @@ const firebaseConfig = {
 };
 
 const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+let authInstance: Auth;
+try {
+  authInstance = getAuth(app);
+} catch (e) {
+  authInstance = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage) as Persistence
+  });
+}
 
-/**
- * Persistência oficial corrigida para silenciar o log e o TS
- */
-const authInstance: Auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage)
-});
-
-export const auth = authInstance; 
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+export const auth = authInstance;
+export const db: Firestore = getFirestore(app);
+export const storage: FirebaseStorage = getStorage(app);
