@@ -1,61 +1,37 @@
-// src/styles/Screens/MapScreenStyles.ts
-import { StyleSheet } from 'react-native';
-import { Colors, Metrics } from '../GlobalStyles';
+import { StyleSheet, Dimensions } from 'react-native';
+import { Colors } from '../GlobalStyles';
+
+const { width } = Dimensions.get('window');
 
 export const MapScreenStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.background,
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
+  map: { ...StyleSheet.absoluteFillObject },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   markerContainer: {
-    padding: 5,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: Colors.primary,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    width: 38, height: 38, justifyContent: 'center', alignItems: 'center',
+    backgroundColor: 'white', borderRadius: 19, borderWidth: 2, borderColor: Colors.primary, elevation: 4,
+  },
+  overlayContainer: {
+    position: 'absolute',
+    bottom: 95, // Elevado para não bater na Navbar
+    width: width, paddingHorizontal: 20, zIndex: 1000,
   },
   calloutContainer: {
-    backgroundColor: 'white',
-    borderRadius: Metrics.radius,
-    padding: 12,
-    width: 200,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    width: '100%', backgroundColor: 'white', borderRadius: 20, overflow: 'hidden', elevation: 15,
   },
-  calloutTitle: {
-    fontWeight: 'bold',
-    fontSize: 14,
-    color: Colors.dark,
-    marginBottom: 4,
+  calloutHeader: {
+    backgroundColor: Colors.primary, padding: 15, flexDirection: 'row', 
+    justifyContent: 'space-between', alignItems: 'center',
   },
-  calloutInfo: {
-    fontSize: 12,
-    color: Colors.gray,
-    marginBottom: 8,
+  calloutTitle: { color: 'white', fontWeight: 'bold', fontSize: 16, flex: 1 },
+  calloutBody: { padding: 20 },
+  calloutRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
+  calloutLabel: { color: '#888', fontSize: 11, fontWeight: 'bold', textTransform: 'uppercase' },
+  calloutValue: { color: '#333', fontWeight: '700', fontSize: 14 },
+  calloutDivider: { height: 1, backgroundColor: '#f0f0f0', marginVertical: 15 },
+  actionButton: {
+    backgroundColor: Colors.primary, borderRadius: 12, paddingVertical: 15,
+    flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
   },
-  calloutButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: 6,
-    padding: 6,
-    alignItems: 'center',
-  },
-  calloutButtonText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: 'bold',
-  }
+  actionButtonText: { color: 'white', fontWeight: 'bold', fontSize: 14, marginRight: 8 },
 });
