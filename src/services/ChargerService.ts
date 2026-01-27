@@ -1,7 +1,6 @@
-// src/services/ChargerService.ts
-import { addDoc, collection, updateDoc, Timestamp } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../config/firebaseConfig';
+import { addDoc, collection, Timestamp } from 'firebase/firestore';
+import { db } from '../config/firebaseConfig';
+import * as Location from 'expo-location'; 
 
 export interface ChargerFormData {
   morada: string;
@@ -12,27 +11,55 @@ export interface ChargerFormData {
   connection_type: "Socket" | "Tethered";
   access_info: string;
   owner_uid: string;
-  imageUri?: string;
   manualLat?: number;
   manualLng?: number;
 }
 
 export const fetchAddressSuggestions = async (query: string) => {
   if (query.length < 5) return [];
+
   try {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Portugal')}&limit=5`;
-    const response = await fetch(url, { 
+    const baseUrl = "https://nominatim.openstreetmap.org/search";
+    const params = new URLSearchParams({
+      q: query,
+      format: "json",
+      countrycodes: "pt",
+      addressdetails: "1",
+      limit: "5"
+    });
+
+    const response = await fetch(`${baseUrl}?${params.toString()}`, { 
       headers: { 'User-Agent': 'Aktie-Production-v1' } 
     });
+
     const data = await response.json();
+
     return data.map((item: any) => ({
       label: item.display_name,
       lat: parseFloat(item.lat),
       lng: parseFloat(item.lon),
     }));
   } catch (error) {
-    console.error("Geocoding failed:", error);
+    console.error("[Service] Autocomplete error:", error);
     return [];
+  }
+};
+
+export const getAddressFromCoords = async (latitude: number, longitude: number) => {
+  try {
+    const reverse = await Location.reverseGeocodeAsync({ latitude, longitude });
+    
+    if (reverse.length > 0) {
+      const addr = reverse[0];
+      const street = addr.street || addr.name || "";
+      const number = addr.streetNumber ? ` ${addr.streetNumber}` : "";
+      const city = addr.city ? `, ${addr.city}` : "";
+      
+      return `${street}${number}${city}`.trim() || "Morada selecionada via Mapa";
+    }
+    return "Localização manual";
+  } catch (error) {
+    return "Coordenadas manuais";
   }
 };
 
@@ -59,9 +86,10 @@ export const createCharger = async (data: ChargerFormData) => {
         longitude: data.manualLng || -9.1427
       }
     });
+
     return { success: true, id: docRef.id };
   } catch (error) {
-    console.error("Firestore Error:", error);
+    console.error("[Service] Firestore Error:", error);
     return { success: false, error };
   }
 };

@@ -17,7 +17,6 @@ const MapScreen = () => {
 
   const slideAnim = useRef(new Animated.Value(400)).current;
 
-  // Efeito de Entrada (Slide Up)
   useEffect(() => {
     if (selectedCharger) {
       Animated.spring(slideAnim, {
@@ -29,7 +28,6 @@ const MapScreen = () => {
     }
   }, [selectedCharger]);
 
-  // Função de Fecho Animado (Slide Down)
   const handleClose = () => {
     Animated.timing(slideAnim, {
       toValue: 400,
@@ -80,7 +78,9 @@ const MapScreen = () => {
         provider={PROVIDER_GOOGLE}
         style={MapScreenStyles.map}
         initialRegion={{ latitude: 38.7369, longitude: -9.1427, latitudeDelta: 0.05, longitudeDelta: 0.05 }}
-        onPress={handleClose} // Fecha ao clicar no mapa
+        onPress={handleClose}
+        // DESATIVA OS BOTOES DE NAVEGAÇÃO NATUIVOS DO GOOGLE
+        toolbarEnabled={false} 
       >
         {chargers.map((charger) => (
           <Marker
@@ -107,8 +107,14 @@ const MapScreen = () => {
             </View>
 
             <View style={MapScreenStyles.calloutBody}>
-              <View style={MapScreenStyles.calloutRow}><Text style={MapScreenStyles.calloutLabel}>POTÊNCIA</Text><Text style={MapScreenStyles.calloutValue}>{selectedCharger.power} kW</Text></View>
-              <View style={MapScreenStyles.calloutRow}><Text style={MapScreenStyles.calloutLabel}>PREÇO</Text><Text style={MapScreenStyles.calloutValue}>{selectedCharger.price} €/kWh</Text></View>
+              <View style={MapScreenStyles.calloutRow}>
+                <Text style={MapScreenStyles.calloutLabel}>POTÊNCIA</Text>
+                <Text style={MapScreenStyles.calloutValue}>{selectedCharger.power} kW</Text>
+              </View>
+              <View style={MapScreenStyles.calloutRow}>
+                <Text style={MapScreenStyles.calloutLabel}>PREÇO</Text>
+                <Text style={MapScreenStyles.calloutValue}>{selectedCharger.price} €/kWh</Text>
+              </View>
               
               <View style={MapScreenStyles.calloutDivider} />
 
@@ -117,7 +123,9 @@ const MapScreen = () => {
                 disabled={!selectedCharger.isActive}
                 onPress={() => navigation.navigate('ChargerDetails', { chargerId: selectedCharger.id })}
               >
-                <Text style={MapScreenStyles.actionButtonText}>{selectedCharger.isActive ? "RESERVAR AGORA" : "INDISPONÍVEL"}</Text>
+                <Text style={MapScreenStyles.actionButtonText}>
+                  {selectedCharger.isActive ? "RESERVAR AGORA" : "INDISPONÍVEL"}
+                </Text>
                 <Ionicons name="chevron-forward" size={18} color="white" />
               </TouchableOpacity>
             </View>
