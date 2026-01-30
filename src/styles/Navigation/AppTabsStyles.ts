@@ -40,7 +40,7 @@ export const AppTabsStyles = StyleSheet.create({
     borderRadius: CIRCLE_SIZE / 2,
     backgroundColor: Colors.primary,
     borderWidth: 4, 
-    borderColor: Colors.background,
+    borderColor: Colors.white,
   },
   iconsContainer: {
     flexDirection: 'row',

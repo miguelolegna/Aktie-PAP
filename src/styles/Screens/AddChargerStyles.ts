@@ -1,32 +1,40 @@
 import { StyleSheet } from 'react-native';
-import { Colors, Metrics } from '../GlobalStyles';
+import { Colors, Metrics, GlobalStyles } from '../GlobalStyles';
 
 export const AddChargerStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-
+  // ==========================================
+  // 1. LAYOUT & CONTENT
+  // ==========================================
+  container: { ...GlobalStyles.container },
   scrollContent: {
     padding: Metrics.padding,
-    paddingBottom: 40,
+    paddingBottom: Metrics.padding * 2,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: Metrics.spacing / 2,
+    marginHorizontal: -4,
   },
 
+  // ==========================================
+  // 2. TYPOGRAPHY
+  // ==========================================
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.dark,
-    marginBottom: 20,
+    ...GlobalStyles.title,
+    marginBottom: Metrics.padding,
   },
-
   label: {
     fontSize: 14,
     fontWeight: '600',
     color: Colors.gray,
-    marginBottom: 8,
-    marginTop: 15,
+    marginBottom: Metrics.spacing - 2,
+    marginTop: Metrics.padding,
   },
 
+  // ==========================================
+  // 3. FORM INPUTS & SEARCH
+  // ==========================================
   input: {
     backgroundColor: Colors.white,
     borderWidth: 1,
@@ -36,109 +44,14 @@ export const AddChargerStyles = StyleSheet.create({
     fontSize: 16,
     color: Colors.dark,
   },
-
-  // ESTILOS DO MAPA (NOVO)
-  mapContainer: {
-    height: 200,
-    width: '100%',
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-
-  mapOverlayLabel: {
-    position: 'absolute',
-    bottom: 10,
-    left: 10,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
-
-  // COMPONENTES DE SELECÇÃO
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 5,
-  },
-
-  optionButton: {
-    flex: 1,
-    backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: Metrics.radius,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginHorizontal: 4,
-  },
-
-  optionSelected: {
-    backgroundColor: Colors.primaryLight,
-    borderColor: Colors.primary,
-  },
-
-  optionText: {
-    fontSize: 13,
-    color: Colors.gray,
-    fontWeight: '500',
-  },
-
-  optionTextSelected: {
-    color: Colors.primaryDark,
-    fontWeight: 'bold',
-  },
-
-  // LISTA DE SUGESTÕES
-  suggestionsContainer: {
-    backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: Metrics.radius,
-    marginTop: 2,
-    maxHeight: 200,
-    zIndex: 10,
-    elevation: 5,
-  },
-
-  suggestionItem: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.background,
-  },
-
-  suggestionText: {
-    fontSize: 14,
-    color: Colors.dark,
-  },
-
-  // BOTÃO DE ENVIO
-  submitButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: Metrics.radius,
-    paddingVertical: 18,
-    alignItems: 'center',
-    marginTop: 30,
-  },
-
-  submitText: {
-    color: Colors.white,
-    fontSize: 16,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
-  // Adicionar ao AddChargerStyles.ts 
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 12,
+    backgroundColor: '#E9ECEF',
+    borderRadius: Metrics.radius,
     paddingHorizontal: 15,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: Colors.border,
   },
   mapTrigger: {
     flexDirection: 'row',
@@ -146,55 +59,107 @@ export const AddChargerStyles = StyleSheet.create({
     paddingVertical: 15,
     marginTop: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: Colors.border,
   },
   mapTriggerText: {
     marginLeft: 10,
     color: Colors.primary,
     fontWeight: 'bold',
   },
+
+  // ==========================================
+  // 4. IMAGE PICKER & SUGGESTIONS
+  // ==========================================
+  imagePicker: {
+    width: '100%',
+    height: 180,
+    backgroundColor: Colors.white,
+    borderRadius: Metrics.radius,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imagePlaceholder: { alignItems: 'center' },
+  previewImage: { width: '100%', height: '100%', borderRadius: Metrics.radius },
+  suggestionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.background,
+  },
+  suggestionText: { fontSize: 14, color: Colors.dark },
+
+  // ==========================================
+  // 5. SLIDING CONTROLS
+  // ==========================================
+  gridContainer: {
+    backgroundColor: '#E9ECEF',
+    borderRadius: Metrics.radius + 4,
+    padding: 4,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  slidingContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#E9ECEF',
+    borderRadius: Metrics.radius + 4,
+    padding: 4,
+    position: 'relative',
+    alignItems: 'center',
+  },
+  sliderActiveBg: {
+    position: 'absolute',
+    left: 4, top: 4,
+    backgroundColor: Colors.white,
+    borderRadius: Metrics.radius,
+    ...GlobalStyles.shadow,
+  },
+  gridOverlay: { ...StyleSheet.absoluteFillObject, flexDirection: 'row', flexWrap: 'wrap', zIndex: 10 },
+  gridOption: { justifyContent: 'center', alignItems: 'center' },
+  slidingOption: { justifyContent: 'center', alignItems: 'center', height: '100%', zIndex: 10 },
+
+  // ==========================================
+  // 6. STATES & BUTTONS
+  // ==========================================
+  optionText: { fontSize: 14, color: Colors.gray, fontWeight: '600' },
+  optionTextSelected: { color: Colors.primary, fontWeight: 'bold' },
+  subLabelText: { fontSize: 10, color: '#ADB5BD', marginTop: 2, textTransform: 'uppercase' },
+  subLabelSelected: { color: Colors.primary, fontWeight: '600' },
+  
+  submitButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: Metrics.radius,
+    padding: 18,
+    marginTop: Metrics.padding * 1.5,
+    alignItems: 'center',
+    ...GlobalStyles.shadow,
+  },
+  submitText: { color: Colors.white, fontWeight: 'bold', fontSize: 16, letterSpacing: 1 },
+
+  // ==========================================
+  // 7. MODAL ELEMENTS (UBER STYLE)
+  // ==========================================
   fixedPinContainer: {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginLeft: -22,
-    marginTop: -45,
+    top: '50%', left: '50%',
+    marginLeft: -24, marginTop: -48,
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  pinShadow: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    marginTop: -2,
-  },
+  pinShadow: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(0,0,0,0.2)', marginTop: -2 },
   mapFooter: {
     position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    backgroundColor: 'white',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-    padding: 25,
-    alignItems: 'center',
-    elevation: 20,
-  },
-  mapInstruction: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 20,
+    bottom: 0, width: '100%',
+    backgroundColor: Colors.white,
+    borderTopLeftRadius: 25, borderTopRightRadius: 25,
+    padding: 25, alignItems: 'center', elevation: 20,
   },
   confirmMapButton: {
     backgroundColor: Colors.primary,
-    width: '100%',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
+    width: '100%', paddingVertical: 16,
+    borderRadius: 12, alignItems: 'center',
   },
-  confirmMapText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  }
+  confirmMapText: { color: Colors.white, fontWeight: 'bold', fontSize: 16 },
 });

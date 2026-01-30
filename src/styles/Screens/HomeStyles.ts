@@ -5,7 +5,8 @@ export const HomeStyles = StyleSheet.create({
   container: { 
     flex: 1, 
     backgroundColor: Colors.background, 
-    paddingTop: 50 
+    paddingTop: 50, 
+    marginBottom: 100
   },
   
   center: { 

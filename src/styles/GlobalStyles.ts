@@ -1,3 +1,4 @@
+// src/styles/GlobalStyles.ts
 import { StyleSheet } from 'react-native';
 
 export const Colors = {
@@ -5,7 +6,7 @@ export const Colors = {
   primaryDark: '#008F7A',
   primaryLight: '#E0F2F1',
   dark: '#263238',
-  gray: '#78909C',
+  gray: '#5f7784',
   border: '#CFD8DC',
   white: '#FFFFFF',
   background: '#F5F7FA',

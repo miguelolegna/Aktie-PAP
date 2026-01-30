@@ -1,129 +1,178 @@
-import { StyleSheet, Dimensions } from 'react-native';
-import { Colors } from '../GlobalStyles';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
+import { Colors, Metrics, GlobalStyles } from '../GlobalStyles';
 
 const { width } = Dimensions.get('window');
 
 export const MapScreenStyles = StyleSheet.create({
-  // CONTENTOR PRINCIPAL
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
+  // ==========================================
+  // 1. CONTENTORES BASE
+  // ==========================================
+  container: { 
+    ...GlobalStyles.container 
+  },
+  map: { 
+    ...StyleSheet.absoluteFillObject 
+  },
+  center: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
   },
 
-  // MOTOR DO MAPA
-  map: {
-    ...StyleSheet.absoluteFillObject,
+  // ==========================================
+  // 2. PESQUISA (LUPA)
+  // ==========================================
+  searchOverlay: {
+    position: 'absolute', 
+    top: Platform.OS === 'ios' ? 60 : 40, 
+    right: 20, // Movido para a esquerda para evitar sobreposição com a bússola
+    zIndex: 2000, 
+    marginTop: 0,
+  },
+  searchBar: {
+    height: 50, 
+    width: 50, // Começa como um círculo
+    backgroundColor: Colors.white, 
+    borderRadius: 25, 
+    flexDirection: 'row',
+    alignItems: 'center', 
+    borderWidth: 1, 
+    borderColor: Colors.border,
+    ...GlobalStyles.shadow,
+    overflow: 'hidden', // Crucial para o círculo perfeito
+  },
+  searchIcon: { 
+    width: 50, // Lógica: largura = altura para círculo perfeito
+    height: 50,
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  searchInput: { 
+    flex: 1, 
+    fontSize: 16, 
+    color: Colors.dark,
+    paddingRight: 20,
+    minWidth: 200,
+  },
+  resultsContainer: {
+    backgroundColor: Colors.white, 
+    borderRadius: 15, 
+    marginTop: 10, 
+    width: 250,
+    maxHeight: 200, 
+    borderWidth: 1, 
+    borderColor: Colors.border,
+    ...GlobalStyles.shadow,
+  },
+  resultItem: { 
+    padding: 15, 
+    borderBottomWidth: 1, 
+    borderBottomColor: Colors.background 
   },
 
-  // ESTADO DE CARREGAMENTO
-  center: {
-    flex: 1,
+  // ==========================================
+  // 3. BOTÃO LOCALIZAÇÃO (RECENTER)
+  // ==========================================
+  recenterButton: {
+    position: 'absolute', 
+    right: 20, 
+    backgroundColor: Colors.white,
+    width: 56, 
+    height: 56, 
+    borderRadius: 28, 
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.background,
-  },
-
-  // DESIGN DO MARCADOR (MARKER)
-  markerContainer: {
-    width: 38,
-    height: 38,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 19,
-    borderWidth: 2,
-    borderColor: Colors.primary,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-  },
-
-  // SOBREPOSIÇÃO FLUTUANTE (OVERLAY)
-  overlayContainer: {
-    position: 'absolute',
-    bottom: 95, 
-    width: width,
-    paddingHorizontal: 20,
+    alignItems: 'center', 
+    borderWidth: 1, 
+    borderColor: Colors.border, 
     zIndex: 1000,
+    ...GlobalStyles.shadow,
   },
 
-  // CARD DE INFORMAÇÕES (CALLOUT ALTERNATIVO)
+  // ==========================================
+  // 4. CARD DE DETALHES (OVERLAY)
+  // ==========================================
+  overlayContainer: {
+    position: 'absolute', 
+    bottom: 100, // Acima da Navbar
+    width: width, 
+    paddingHorizontal: 20, 
+    zIndex: 1500,
+  },
   calloutContainer: {
-    width: '100%',
-    backgroundColor: 'white',
-    borderRadius: 20,
+    width: '100%', 
+    backgroundColor: Colors.white, 
+    borderRadius: 20, 
     overflow: 'hidden',
-    elevation: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
+    ...GlobalStyles.shadow,
+    elevation: 10,
   },
-
-  // CABEÇALHO DO CARD
   calloutHeader: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    backgroundColor: Colors.primary, 
+    paddingVertical: 12, 
+    paddingHorizontal: 15,
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
     alignItems: 'center',
   },
-
-  calloutTitle: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    flex: 1,
+  calloutTitle: { 
+    color: Colors.white, 
+    fontWeight: 'bold', 
+    fontSize: 14, 
+    flex: 1 
   },
-
-  // CORPO DE DADOS DO CARD
-  calloutBody: {
-    padding: 20,
+  calloutBody: { 
+    padding: 15, 
+    flexDirection: 'row', 
+    alignItems: 'center' 
   },
-
-  calloutRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
+  connectorIconContainer: {
+    backgroundColor: '#F1F3F5', 
+    padding: 12, 
+    borderRadius: 15, 
+    marginRight: 15,
   },
-
-  calloutLabel: {
-    color: '#888',
-    fontSize: 11,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
+  infoColumn: { 
+    flex: 1, 
+    justifyContent: 'center' 
   },
-
-  calloutValue: {
-    color: '#333',
-    fontWeight: '700',
-    fontSize: 14,
+  infoRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 4 
   },
-
-  // ELEMENTOS DE SEPARAÇÃO E BOTÕES
-  calloutDivider: {
-    height: 1,
-    backgroundColor: '#f0f0f0',
-    marginVertical: 15,
+  infoText: { 
+    fontSize: 15, 
+    fontWeight: '700', 
+    color: Colors.dark, 
+    marginLeft: 8 
   },
-
   actionButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    paddingVertical: 15,
-    flexDirection: 'row',
-    justifyContent: 'center',
+    backgroundColor: Colors.primary, 
+    borderRadius: 12, 
+    paddingVertical: 10, 
+    paddingHorizontal: 15,
+    flexDirection: 'row', 
     alignItems: 'center',
-    elevation: 3,
+  },
+  actionButtonText: { 
+    color: Colors.white, 
+    fontWeight: 'bold', 
+    fontSize: 12, 
+    marginRight: 4 
   },
 
-  actionButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 14,
-    marginRight: 8,
-  }
+  // ==========================================
+  // 5. MARCADORES (MARKERS)
+  // ==========================================
+  markerContainer: {
+    width: 38, 
+    height: 38, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    backgroundColor: Colors.white, 
+    borderRadius: 19, 
+    borderWidth: 2, 
+    borderColor: Colors.primary,
+    ...GlobalStyles.shadow,
+  },
 });

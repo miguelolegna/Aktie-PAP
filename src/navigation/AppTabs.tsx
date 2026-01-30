@@ -1,3 +1,4 @@
+// src/navigation/AppTabs.tsx
 import React, { useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Animated } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -127,7 +128,7 @@ const AppTabs = () => (
     initialRouteName="Mapa"
   >
     <Tab.Screen name="Carregadores" component={HomeScreen} />
-    <Tab.Screen name="Mapa" component={MapScreen} />
+    <Tab.Screen name="Mapa" component={MapScreen} options={{ unmountOnBlur: true }} />
     <Tab.Screen name="Reservas" component={BookingsScreen} />
     <Tab.Screen name="Perfil" component={ProfileScreen} />
   </Tab.Navigator>

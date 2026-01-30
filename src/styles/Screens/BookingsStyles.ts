@@ -8,7 +8,7 @@ export const BookingsStyles = StyleSheet.create({
     padding: Metrics.padding,
   },
   title: {
-    color: Colors.white,
+    color: Colors.primary,
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
@@ -18,7 +18,7 @@ export const BookingsStyles = StyleSheet.create({
     paddingBottom: 20,
   },
   bookingCard: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: Colors.background,
     borderRadius: Metrics.radius,
     padding: 15,
     marginBottom: Metrics.spacing,

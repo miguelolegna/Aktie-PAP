@@ -1,119 +1,90 @@
-// src/screens/SplashScreen.tsx
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated } from 'react-native';
-import { useVideoPlayer, VideoView } from 'expo-video'; // Nova biblioteca
+import { Animated, StyleSheet, View } from 'react-native';
+import { useVideoPlayer, VideoView } from 'expo-video'; 
 import { useEvent } from 'expo';
-import { splashStyles } from '../styles/Screens/SplashScreenStyles';
 
 interface SmartSplashScreenProps {
   isLoading: boolean;
-  onFinish: () => void;
+  onPrepareExit: () => void; // Gatilho para montar o Navigator pesado
+  onFinish: () => void;      // Gatilho para desmontar a Splash
 }
 
-const SmartSplashScreen: React.FC<SmartSplashScreenProps> = ({ isLoading, onFinish }) => {
+const SmartSplashScreen: React.FC<SmartSplashScreenProps> = ({ isLoading, onPrepareExit, onFinish }) => {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const [isVisible, setIsVisible] = useState(true);
-  const [videoFinished, setVideoFinished] = useState(false);
+  const exitTriggered = useRef(false);
 
-  // 1. Configurar o Player com a nova API
-  const player = useVideoPlayer(require('../../assets/Animação_com_Ficha_na_Ponta.mp4'), (player) => {
-    player.loop = false;
-    player.muted = true;
-    player.play();
+  const player = useVideoPlayer(require('../../assets/Animação_com_Ficha_na_Ponta.mp4'), (p) => {
+    p.loop = false;
+    p.muted = true;
+    p.play();
   });
 
-  // 2. Hook para ouvir eventos do player (status, tempo, etc)
-  useEvent(player, 'playingChange'); 
-  // Nota: expo-video gere o tempo internamente, não precisamos de state para cada milissegundo
+  // Listeners de eventos para atualização de estado
+  useEvent(player, 'playingChange');
+  useEvent(player, 'statusChange');
 
-  // Lógica de Controlo (Rápido vs Lento)
   useEffect(() => {
-    // Verificar periodicamente o tempo, já que o evento de timeUpdate é muito rápido
-    const interval = setInterval(() => {
-      if (!player) return;
-      
-      const duration = player.duration;
-      const currentTime = player.currentTime;
+    const checkStatus = () => {
+      if (exitTriggered.current) return;
 
-      // Se duração ainda for 0 (não carregou metadata), ignora
-      if (duration <= 0) return;
-
-      // Se o vídeo terminou
-      if (currentTime >= duration - 0.1) { // margem de erro pequena
-         setVideoFinished(true);
-         checkCompletion(isLoading, true);
-         return;
+      // 1. Aceleração se os dados já carregaram
+      if (!isLoading && player.playing) {
+        player.playbackRate = 2.5;
       }
 
-      // LÓGICA INTELIGENTE
-      // Se faltar pouco para acabar (0.2s)
-      if (currentTime > duration - 0.2) {
-        if (isLoading) {
-          // Se a app ainda carrega, PAUSA no fim
-          if (player.playing) {
-            console.log('Loading lento: Pausando vídeo...');
-            player.pause();
-          }
-        } else {
-          // Se a app já carregou, ACELERA ou DEIXA TERMINAR
-          // Na nova API, checkCompletion trata de fechar se já acabou
-        }
+      // 2. Verificação de Fim de Vídeo
+      const isVideoAtEnd = player.duration > 0 && player.currentTime >= (player.duration - 0.2);
+      const isIdle = player.status === 'idle';
+
+      // 3. Saída Sequencial: Só quando Loading termina E Vídeo acaba
+      if (!isLoading && (isVideoAtEnd || isIdle)) {
+        exitTriggered.current = true;
+        
+        // PRIMEIRO: Sinaliza ao App.tsx para montar o Mapa em background
+        onPrepareExit(); 
+
+        // SEGUNDO: Inicia o fade-out visual
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 700,
+          useNativeDriver: true,
+        }).start(() => {
+          setIsVisible(false);
+          onFinish();
+        });
       }
-    }, 100); // Verifica a cada 100ms
+    };
 
-    return () => clearInterval(interval);
-  }, [isLoading, player.currentTime]); // Dependências do efeito
-
-
-  // Reagir ao fim do loading externo
-  useEffect(() => {
-    if (!isLoading) {
-      // Se o loading acabou e o vídeo ainda está no início/meio -> ACELERA
-      if (player.duration > 0 && player.currentTime < player.duration - 0.5) {
-        console.log('Loading rápido: Acelerando (4x)');
-        player.playbackRate = 4.0; 
-      }
-      
-      // Se o vídeo estava pausado no fim à espera -> Retoma/Finaliza
-      // A verificação periódica acima vai apanhar o estado de "finished"
-      if (!player.playing && player.currentTime > player.duration - 0.2) {
-          setVideoFinished(true);
-          checkCompletion(false, true);
-      }
-    }
-  }, [isLoading]);
-
-
-  const checkCompletion = (loadingState: boolean, videoState: boolean) => {
-    if (!loadingState && videoState) {
-      startExitAnimation();
-    }
-  };
-
-  const startExitAnimation = () => {
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 800,
-      useNativeDriver: true,
-    }).start(() => {
-      setIsVisible(false);
-      if (onFinish) onFinish();
-    });
-  };
+    // Usamos requestAnimationFrame para manter a fluidez sem entupir a thread
+    const frame = requestAnimationFrame(checkStatus);
+    return () => cancelAnimationFrame(frame);
+  }, [isLoading, player.currentTime, player.status]);
 
   if (!isVisible) return null;
 
   return (
-    <Animated.View style={[splashStyles.container, { opacity: fadeAnim }]}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <VideoView
         player={player}
-        style={splashStyles.videoView}
-        contentFit="contain" // Equivalente ao resizeMode: CONTAIN
-        nativeControls={false} // Esconde controlos nativos
-        showsTimecodes={false}
+        style={styles.videoView}
+        contentFit="contain"
+        nativeControls={false}
       />
     </Animated.View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#FFFFFF',
+    zIndex: 99999,
+  },
+  videoView: {
+    width: '100%',
+    height: '100%',
+  },
+});
 
 export default SmartSplashScreen;

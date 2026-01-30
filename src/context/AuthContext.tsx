@@ -10,6 +10,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { auth, db } from '../config/firebaseConfig';
+
 interface AuthContextData {
   user: User | null;
   loading: boolean;
@@ -25,12 +26,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Agora usamos a constante 'auth' diretamente sem funções intermédias
+    // FAILSAFE: Garante que o estado de loading termina mesmo sem resposta do Firebase
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.warn("[Auth] Timeout de rede atingido. Forçando entrada como convidado.");
+        setLoading(false);
+      }
+    }, 5000);
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+      clearTimeout(timeout); // Limpa o timer se o Firebase responder a tempo
+    }, (error) => {
+      console.error("[Auth] Erro no observador:", error);
+      setLoading(false);
+      clearTimeout(timeout);
     });
-    return () => unsubscribe();
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const authHelpers = useMemo(() => ({

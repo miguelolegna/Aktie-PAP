@@ -1,6 +1,7 @@
-// src/styles/Screens/ChargerDetailsStyles.ts
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 import { Colors } from '../GlobalStyles';
+
+const { width } = Dimensions.get('window');
 
 export const chargerDetailsStyles = StyleSheet.create({
   container: { 
@@ -13,8 +14,36 @@ export const chargerDetailsStyles = StyleSheet.create({
     alignItems: 'center' 
   },
   scrollContent: { 
-    padding: 20, 
-    paddingBottom: 120 // Espaço extra para o footer não tapar o conteúdo
+    paddingBottom: 120 
+  },
+
+  // --- IMAGE SECTION ---
+  imageContainer: {
+    width: width,
+    height: 280,
+    backgroundColor: Colors.background,
+  },
+  chargerImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  placeholderImage: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+  },
+
+  // --- CONTENT WRAPPER ---
+  contentWrapper: {
+    paddingHorizontal: 20,
+    marginTop: -25, // Sobreposição para efeito moderno
+    backgroundColor: Colors.white,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingTop: 30,
   },
 
   // --- HEADER SECTION ---
@@ -24,8 +53,8 @@ export const chargerDetailsStyles = StyleSheet.create({
   titleRow: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
-    alignItems: 'flex-start', 
-    marginBottom: 8 
+    alignItems: 'center', 
+    marginBottom: 10 
   },
   addressTitle: { 
     fontSize: 22, 
@@ -37,90 +66,72 @@ export const chargerDetailsStyles = StyleSheet.create({
   ratingBadge: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    backgroundColor: '#FFF9C4', // Amarelo muito claro
-    paddingHorizontal: 8, 
-    paddingVertical: 4, 
-    borderRadius: 12 
+    backgroundColor: '#FFF9C4', 
+    paddingHorizontal: 10, 
+    paddingVertical: 5, 
+    borderRadius: 15 
   },
   ratingText: { 
     fontSize: 14, 
     fontWeight: 'bold', 
-    color: '#FBC02D', // Amarelo escuro
+    color: '#FBC02D', 
     marginLeft: 4 
-  },
-  statusTag: { 
-    alignSelf: 'flex-start', 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    paddingHorizontal: 10, 
-    paddingVertical: 6, 
-    borderRadius: 20,
-    // Cor de fundo é dinâmica no componente
-  },
-  statusDot: { 
-    width: 8, 
-    height: 8, 
-    borderRadius: 4, 
-    marginRight: 6 
-  },
-  statusText: { 
-    fontSize: 12, 
-    fontWeight: 'bold' 
   },
 
   // --- SPECS GRID ---
   sectionTitle: { 
     fontSize: 18, 
-    fontWeight: '600', 
+    fontWeight: '700', 
     color: Colors.dark, 
-    marginBottom: 15 
+    marginBottom: 15,
+    letterSpacing: 0.5
   },
   specsGrid: { 
     flexDirection: 'row', 
     flexWrap: 'wrap', 
-    gap: 12, 
+    justifyContent: 'space-between',
     marginBottom: 25 
   },
   specCard: { 
-    width: '48%', // Quase metade para caber 2 por linha com gap
-    backgroundColor: Colors.background, 
-    borderRadius: 12, 
-    padding: 15, 
+    width: '48%', 
+    backgroundColor: '#F8F9FA', 
+    borderRadius: 16, 
+    padding: 18, 
     alignItems: 'center',
+    marginBottom: 12,
     borderWidth: 1,
-    borderColor: Colors.border
+    borderColor: '#F1F3F5'
   },
   specLabel: { 
-    fontSize: 12, 
+    fontSize: 11, 
     color: Colors.gray, 
     marginTop: 8, 
-    marginBottom: 4 
+    textTransform: 'uppercase',
+    fontWeight: '700'
   },
   specValue: { 
-    fontSize: 16, 
+    fontSize: 15, 
     fontWeight: 'bold', 
-    color: Colors.dark 
+    color: Colors.dark,
+    marginTop: 2
   },
 
   // --- INFO SECTION ---
   infoSection: { 
-    backgroundColor: Colors.background, 
-    padding: 15, 
-    borderRadius: 12 
-  },
-  infoRow: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    gap: 10 
+    backgroundColor: '#F8F9FA', 
+    padding: 20, 
+    borderRadius: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#F1F3F5'
   },
   infoText: { 
     fontSize: 14, 
-    color: Colors.gray, 
-    flex: 1, 
-    lineHeight: 20 
+    color: '#495057', 
+    lineHeight: 22 
   },
 
-  // --- FOOTER (Sticky) ---
+  // --- FOOTER (FIXO) ---
   footer: {
     position: 'absolute', 
     bottom: 0, 
@@ -128,38 +139,40 @@ export const chargerDetailsStyles = StyleSheet.create({
     right: 0,
     backgroundColor: Colors.white,
     borderTopWidth: 1, 
-    borderTopColor: Colors.border,
+    borderTopColor: '#EEEEEE',
     padding: 20, 
-    paddingBottom: 30, // Safe area para iPhones novos
+    paddingBottom: Platform.OS === 'ios' ? 40 : 25,
     flexDirection: 'row', 
     justifyContent: 'space-between', 
     alignItems: 'center',
-    // Sombra para dar destaque
-    shadowColor: Colors.shadow, 
-    shadowOffset: { width: 0, height: -3 }, 
-    shadowOpacity: 0.1, 
-    shadowRadius: 4, 
-    elevation: 10
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -10 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
   },
-  priceLabel: { 
-    fontSize: 12, 
-    color: Colors.gray 
+  priceLabel: { // O ESTILO QUE FALTAVA
+    fontSize: 12,
+    color: Colors.gray,
+    textTransform: 'uppercase',
+    fontWeight: '600',
+    marginBottom: 2
   },
   priceValue: { 
     fontSize: 24, 
-    fontWeight: 'bold', 
-    color: Colors.dark 
+    fontWeight: '800', 
+    color: Colors.primary 
   },
   reserveButton: { 
     backgroundColor: Colors.primary, 
-    paddingVertical: 14, 
-    paddingHorizontal: 32, 
-    borderRadius: 12, 
-    elevation: 2 
+    paddingVertical: 15, 
+    paddingHorizontal: 35, 
+    borderRadius: 15, 
   },
   reserveButtonText: { 
     color: Colors.white, 
     fontSize: 16, 
-    fontWeight: 'bold' 
+    fontWeight: 'bold',
+    textTransform: 'uppercase'
   }
 });

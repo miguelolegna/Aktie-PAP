@@ -3,104 +3,32 @@ import { StyleSheet } from 'react-native';
 import { Colors, Metrics } from '../GlobalStyles';
 
 export const ProfileStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-    padding: Metrics.padding,
-    paddingBottom: 110, 
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.background,
-    padding: Metrics.padding,
-  },
-  header: {
-    alignItems: 'center',
-    marginVertical: 30,
-  },
-  avatarPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  avatarLetter: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: Colors.primaryDark,
-  },
-  name: {
-    color: Colors.dark,
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  email: {
-    color: Colors.gray,
-    fontSize: 14,
-    marginTop: 4,
-  },
-  guestTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: Colors.dark,
-    marginTop: 10,
-  },
-  guestSubtitle: {
-    fontSize: 14,
-    color: Colors.gray,
-    textAlign: 'center',
-    marginTop: 10,
-    lineHeight: 20,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 30,
-  },
-  statBox: {
+  container: { flex: 1, backgroundColor: Colors.background },
+  header: { 
+    alignItems: 'center', 
+    paddingVertical: 30, 
     backgroundColor: Colors.white,
-    padding: 15,
-    borderRadius: Metrics.radius,
-    alignItems: 'center',
-    width: '48%',
-    borderWidth: 1,
-    borderColor: Colors.border,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    elevation: 4,
   },
-  statLabel: {
-    color: Colors.gray,
-    fontSize: 11,
-    textTransform: 'uppercase',
-    marginBottom: 5,
+  avatarContainer: { position: 'relative' },
+  avatar: { width: 100, height: 100, borderRadius: 50 },
+  editAvatarButton: {
+    position: 'absolute', bottom: 0, right: 0,
+    backgroundColor: Colors.primary, padding: 8, borderRadius: 20,
+    borderWidth: 3, borderColor: Colors.white
   },
-  statValue: {
-    color: Colors.primary,
-    fontSize: 18,
-    fontWeight: 'bold',
+  userName: { fontSize: 20, fontWeight: 'bold', color: Colors.dark, marginTop: 12 },
+  userEmail: { fontSize: 14, color: Colors.gray },
+  section: { marginTop: 25, paddingHorizontal: 20 },
+  sectionTitle: { fontSize: 12, fontWeight: '800', color: Colors.gray, textTransform: 'uppercase', marginBottom: 10, letterSpacing: 1 },
+  menuItem: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    backgroundColor: Colors.white, padding: 15, borderRadius: 15, marginBottom: 8,
+    elevation: 1,
   },
-  primaryButton: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 16,
-    borderRadius: Metrics.radius,
-    alignItems: 'center',
-    marginTop: 'auto',
-    marginBottom: 12,
-  },
-  logoutButton: {
-    backgroundColor: Colors.dangerLight,
-    borderWidth: 1,
-    borderColor: Colors.danger,
-    paddingVertical: 16,
-    borderRadius: Metrics.radius,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: Colors.white,
-    fontWeight: 'bold',
-    fontSize: 16,
-  }
+  menuItemLeft: { flexDirection: 'row', alignItems: 'center' },
+  iconContainer: { padding: 10, borderRadius: 12, marginRight: 15 },
+  menuLabel: { fontSize: 15, fontWeight: '600', color: Colors.dark },
 });

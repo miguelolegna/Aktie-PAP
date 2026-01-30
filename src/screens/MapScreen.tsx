@@ -1,136 +1,242 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, ActivityIndicator, Text, TouchableOpacity, Animated } from 'react-native';
+import { 
+  View, ActivityIndicator, Text, TouchableOpacity, Animated, 
+  TextInput, FlatList, Linking, Platform, Easing, Keyboard
+} from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
+import { fetchAddressSuggestions } from '../services/ChargerService';
 import { Colors } from '../styles/GlobalStyles';
-import { MapScreenStyles } from '../styles/Screens/MapScreenStyles';
-import { FontAwesome6, Ionicons } from '@expo/vector-icons';
+import { MapScreenStyles as styles } from '../styles/Screens/MapScreenStyles';
+import { FontAwesome6, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { getConnectorIcon } from '../utils/IconMapper';
 
 const MapScreen = () => {
+  const navigation = useNavigation<any>();
+  const mapRef = useRef<MapView>(null);
+  
+  // 1. HOOKS DE ESTADO (Sempre no topo)
   const [loading, setLoading] = useState(true);
   const [chargers, setChargers] = useState<any[]>([]);
   const [selectedCharger, setSelectedCharger] = useState<any | null>(null);
-  const [trackChanges, setTrackChanges] = useState(true);
-  const navigation = useNavigation<any>();
+  const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [shouldTrack, setShouldTrack] = useState(true);
 
-  const slideAnim = useRef(new Animated.Value(400)).current;
+  // 2. HOOKS DE ANIMAÇÃO
+  const searchWidth = useRef(new Animated.Value(50)).current;
+  const recenterBottom = useRef(new Animated.Value(110)).current; // Base acima da navbar
 
+  // 3. EFEITO: DINÂMICA DO BOTÃO RECENTER
   useEffect(() => {
-    if (selectedCharger) {
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        useNativeDriver: true,
-        friction: 8,
-        tension: 50,
-      }).start();
-    }
+    Animated.timing(recenterBottom, {
+      toValue: selectedCharger ? 280 : 110, // Sobe se o card abrir, desce se fechar
+      duration: 300,
+      easing: Easing.bezier(0.4, 0, 0.2, 1),
+      useNativeDriver: false, // Propriedade 'bottom' não suporta native driver
+    }).start();
   }, [selectedCharger]);
 
-  const handleClose = () => {
-    Animated.timing(slideAnim, {
-      toValue: 400,
-      duration: 250,
-      useNativeDriver: true,
-    }).start(() => {
-      setSelectedCharger(null);
-    });
-  };
+  // 4. EFEITOS DE CARREGAMENTO E PERMISSÕES
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+      let location = await Location.getCurrentPositionAsync({});
+      setUserLocation(location);
+    })();
+  }, []);
 
   useEffect(() => {
     const q = query(collection(db, "chargers"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const data: any[] = [];
-      querySnapshot.forEach((doc) => {
-        const d = doc.data();
-        data.push({
-          id: doc.id,
-          latitude: Number(d.localizacao?.latitude || d.latitude),
-          longitude: Number(d.localizacao?.longitude || d.longitude),
-          title: d.morada || "Carregador Aktie",
-          power: d.potencia_kw || "?",
-          price: d.preco_kwh || "?",
-          isActive: d.is_active ?? true,
-          tipoTomada: d.tipo_tomada || "Type 2"
-        });
-      });
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        latitude: Number(doc.data().localizacao?.latitude || 38.7369),
+        longitude: Number(doc.data().localizacao?.longitude || -9.1427),
+        tipo_tomada: doc.data().tipo_tomada || 'Tipo 2'
+      }));
       setChargers(data);
-      setLoading(false);
-    }, (error) => {
-      console.error("Erro Firestore:", error);
       setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    if (!loading && chargers.length > 0) {
-      setTimeout(() => setTrackChanges(false), 2000);
+    if (chargers.length > 0) {
+      const timer = setTimeout(() => setShouldTrack(false), 1500);
+      return () => clearTimeout(timer);
     }
-  }, [loading, chargers]);
+  }, [chargers]);
 
-  if (loading) return <View style={MapScreenStyles.center}><ActivityIndicator size="large" color={Colors.primary} /></View>;
+  // 5. FUNÇÕES DE INTERAÇÃO
+  const handleSearch = async (text: string) => {
+    setSearchQuery(text);
+    if (text.length > 3) {
+      const res = await fetchAddressSuggestions(text);
+      setSuggestions(res);
+    } else { setSuggestions([]); }
+  };
+
+  const selectPlace = (item: any) => {
+    // 1. Move o mapa
+    mapRef.current?.animateToRegion({
+      latitude: item.lat, longitude: item.lng,
+      latitudeDelta: 0.01, longitudeDelta: 0.01,
+    }, 1000);
+
+    // 2. Limpa estados e fecha o teclado
+    setSuggestions([]);
+    setIsSearchExpanded(false);
+    setSearchQuery(''); // Opcional: limpar o texto
+    Keyboard.dismiss();
+
+    // 3. NOVO: Colapsa a barra de pesquisa de volta ao ícone
+    Animated.timing(searchWidth, {
+      toValue: 50,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const toggleSearch = () => {
+    Animated.timing(searchWidth, {
+      toValue: isSearchExpanded ? 50 : 280,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+    setIsSearchExpanded(!isSearchExpanded);
+    if (isSearchExpanded) {
+        Keyboard.dismiss();
+    }
+  };
+
+  const recenter = () => {
+    if (userLocation) {
+      mapRef.current?.animateToRegion({
+        latitude: userLocation.coords.latitude,
+        longitude: userLocation.coords.longitude,
+        latitudeDelta: 0.01, longitudeDelta: 0.01,
+      }, 800);
+    }
+  };
+
+  // 6. RENDERIZAÇÃO CONDICIONAL (Depois dos Hooks)
+  if (loading) return <View style={styles.center}><ActivityIndicator size="large" color={Colors.primary} /></View>;
 
   return (
-    <View style={MapScreenStyles.container}>
+    <View style={styles.container}>
       <MapView
+        ref={mapRef}
         provider={PROVIDER_GOOGLE}
-        style={MapScreenStyles.map}
-        initialRegion={{ latitude: 38.7369, longitude: -9.1427, latitudeDelta: 0.05, longitudeDelta: 0.05 }}
-        onPress={handleClose}
-        // DESATIVA OS BOTOES DE NAVEGAÇÃO NATUIVOS DO GOOGLE
-        toolbarEnabled={false} 
+        style={styles.map}
+        showsUserLocation={true} // Reativa o ponto azul
+        showsMyLocationButton={false}
+        onPress={() => {
+            setSelectedCharger(null);
+            Keyboard.dismiss();
+            if (isSearchExpanded) toggleSearch(); // Fecha a pesquisa se tocar no mapa
+        }}
+        toolbarEnabled={false}
       >
-        {chargers.map((charger) => (
-          <Marker
-            key={charger.id}
-            coordinate={{ latitude: charger.latitude, longitude: charger.longitude }}
-            onPress={() => setSelectedCharger(charger)}
-            tracksViewChanges={trackChanges}
-          >
-            <View style={MapScreenStyles.markerContainer}>
-              <FontAwesome6 name="charging-station" size={20} color={charger.isActive ? Colors.primary : "#808080"} />
-            </View>
-          </Marker>
-        ))}
+        {chargers.map((charger) => {
+          if (isNaN(charger.latitude) || isNaN(charger.longitude)) return null;
+          return (
+            <Marker
+              key={charger.id}
+              coordinate={{ latitude: charger.latitude, longitude: charger.longitude }}
+              onPress={() => setSelectedCharger(charger)}
+              tracksViewChanges={shouldTrack} // Previne IllegalStateException
+            >
+              <View style={styles.markerContainer}>
+                <FontAwesome6 name="charging-station" size={16} color={Colors.primary} />
+              </View>
+            </Marker>
+          );
+        })}
       </MapView>
 
+      {/* LUPA (PESQUISA) - Agora à esquerda */}
+      <View style={styles.searchOverlay}>
+        <Animated.View style={[styles.searchBar, { width: searchWidth }]}>
+          <TouchableOpacity onPress={toggleSearch} style={styles.searchIcon}>
+            <Ionicons name={isSearchExpanded ? "close" : "search"} size={22} color={Colors.primary} />
+          </TouchableOpacity>
+          {isSearchExpanded && (
+            <TextInput
+              autoFocus style={styles.searchInput}
+              placeholder="Onde carregar?"
+              value={searchQuery}
+              onChangeText={handleSearch}
+            />
+          )}
+        </Animated.View>
+        
+        {suggestions.length > 0 && (
+          <View style={styles.resultsContainer}>
+            <FlatList
+              data={suggestions}
+              keyExtractor={(_, i) => i.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.resultItem} onPress={() => selectPlace(item)}>
+                  <Text style={{ fontSize: 14 }}>{item.label}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        )}
+      </View>
+
+      {/* BOTÃO LOCALIZAÇÃO - Dinâmico */}
+      <Animated.View style={[styles.recenterButton, { bottom: recenterBottom }]}>
+        <TouchableOpacity onPress={recenter}>
+          <MaterialIcons name="my-location" size={26} color={Colors.primary} />
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* CARD DE DETALHES - Overlay acima da Navbar */}
       {selectedCharger && (
-        <Animated.View style={[MapScreenStyles.overlayContainer, { transform: [{ translateY: slideAnim }] }]}>
-          <View style={MapScreenStyles.calloutContainer}>
-            <View style={MapScreenStyles.calloutHeader}>
-              <Text style={MapScreenStyles.calloutTitle} numberOfLines={1}>{selectedCharger.title}</Text>
-              <TouchableOpacity onPress={handleClose}>
-                <Ionicons name="close-circle" size={26} color="white" />
+        <View style={styles.overlayContainer}>
+          <View style={styles.calloutContainer}>
+            <View style={styles.calloutHeader}>
+              <Text style={styles.calloutTitle} numberOfLines={1}>{selectedCharger.morada}</Text>
+              <TouchableOpacity onPress={() => {}}>
+                <MaterialIcons name="directions" size={24} color="white" />
               </TouchableOpacity>
             </View>
 
-            <View style={MapScreenStyles.calloutBody}>
-              <View style={MapScreenStyles.calloutRow}>
-                <Text style={MapScreenStyles.calloutLabel}>POTÊNCIA</Text>
-                <Text style={MapScreenStyles.calloutValue}>{selectedCharger.power} kW</Text>
+            <View style={styles.calloutBody}>
+              <View style={styles.connectorIconContainer}>
+                {getConnectorIcon(selectedCharger.tipo_tomada, 36, Colors.primary)}
               </View>
-              <View style={MapScreenStyles.calloutRow}>
-                <Text style={MapScreenStyles.calloutLabel}>PREÇO</Text>
-                <Text style={MapScreenStyles.calloutValue}>{selectedCharger.price} €/kWh</Text>
+
+              <View style={styles.infoColumn}>
+                <View style={styles.infoRow}>
+                  <FontAwesome6 name="bolt" size={12} color="#888" />
+                  <Text style={styles.infoText}>{selectedCharger.potencia_kw} kW</Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <FontAwesome6 name="euro-sign" size={12} color="#888" />
+                  <Text style={styles.infoText}>{selectedCharger.preco_kwh} €/kWh</Text>
+                </View>
               </View>
-              
-              <View style={MapScreenStyles.calloutDivider} />
 
               <TouchableOpacity 
-                style={[MapScreenStyles.actionButton, { opacity: selectedCharger.isActive ? 1 : 0.6 }]}
-                disabled={!selectedCharger.isActive}
+                style={styles.actionButton}
                 onPress={() => navigation.navigate('ChargerDetails', { chargerId: selectedCharger.id })}
               >
-                <Text style={MapScreenStyles.actionButtonText}>
-                  {selectedCharger.isActive ? "RESERVAR AGORA" : "INDISPONÍVEL"}
-                </Text>
-                <Ionicons name="chevron-forward" size={18} color="white" />
+                <Text style={styles.actionButtonText}>DETALHES</Text>
+                <Ionicons name="chevron-forward" size={14} color="white" />
               </TouchableOpacity>
             </View>
           </View>
-        </Animated.View>
+        </View>
       )}
     </View>
   );

@@ -1,113 +1,86 @@
 // src/screens/ProfileScreen.tsx
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, SafeAreaView, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { doc, getDoc } from 'firebase/firestore';
-import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { db } from '../config/firebaseConfig';
 import { ProfileStyles as styles } from '../styles/Screens/ProfileStyles';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '../styles/GlobalStyles';
 
-interface UserProfile {
-  nome: string;
-  email: string;
-  telefone: string;
-  rating_medio: number;
-}
+const ProfileScreen = ({ navigation }: any) => {
+  const { user, logout } = useAuth();
 
-const ProfileScreen = () => {
-  const navigation = useNavigation<any>();
-  const { user, logout, loading: authLoading } = useAuth();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setProfile(docSnap.data() as UserProfile);
-        }
-      } catch (error) {
-        console.error("Erro ao carregar perfil:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [user]);
-
-  const handleLogout = () => {
-    Alert.alert("Sair", "Tens a certeza que desejas terminar sessão?", [
-      { text: "Cancelar", style: "cancel" },
-      { text: "Sair", style: "destructive", onPress: logout }
-    ]);
-  };
-
-  if (loading || authLoading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={Colors.primary} />
+  const MenuOption = ({ icon, label, onPress, color = Colors.dark }: any) => (
+    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
+      <View style={styles.menuItemLeft}>
+        <View style={[styles.iconContainer, { backgroundColor: color + '15' }]}>
+          <MaterialCommunityIcons name={icon} size={22} color={color} />
+        </View>
+        <Text style={styles.menuLabel}>{label}</Text>
       </View>
-    );
-  }
+      <Ionicons name="chevron-forward" size={18} color={Colors.gray} />
+    </TouchableOpacity>
+  );
 
-  // GUEST MODE VIEW
-  if (!user) {
-    return (
-      <SafeAreaView style={styles.centered}>
-        <Ionicons name="person-circle-outline" size={100} color={Colors.gray} />
-        <Text style={styles.guestTitle}>Olá, Visitante</Text>
-        <Text style={styles.guestSubtitle}>Inicia sessão para gerir os teus postos, reservas e pagamentos.</Text>
-        <TouchableOpacity 
-          style={[styles.primaryButton, { width: '80%', marginTop: 20 }]} 
-          onPress={() => navigation.navigate('Auth')}
-        >
-          <Text style={styles.buttonText}>ENTRAR / REGISTAR</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
-    );
-  }
-
-  // AUTHENTICATED VIEW
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView style={styles.container}>
+      {/* HEADER: INFO DO UTILIZADOR */}
       <View style={styles.header}>
-        <View style={styles.avatarPlaceholder}>
-            <Text style={styles.avatarLetter}>{profile?.nome?.charAt(0) || "U"}</Text>
+        <View style={styles.avatarContainer}>
+          <Image 
+            source={{ uri: user?.photoURL || 'https://via.placeholder.com/150' }} 
+            style={styles.avatar} 
+          />
+          <TouchableOpacity style={styles.editAvatarButton}>
+            <Ionicons name="camera" size={16} color="white" />
+          </TouchableOpacity>
         </View>
-        <Text style={styles.name}>{profile?.nome || "Utilizador Aktie"}</Text>
-        <Text style={styles.email}>{user.email}</Text>
+        <Text style={styles.userName}>{user?.displayName || 'Utilizador Aktie'}</Text>
+        <Text style={styles.userEmail}>{user?.email}</Text>
       </View>
 
-      <View style={styles.statsContainer}>
-        <View style={styles.statBox}>
-          <Text style={styles.statLabel}>Rating</Text>
-          <Text style={styles.statValue}>{profile?.rating_medio?.toFixed(1) || "5.0"} ★</Text>
-        </View>
-        <View style={styles.statBox}>
-          <Text style={styles.statLabel}>Telemóvel</Text>
-          <Text style={styles.statValue}>{profile?.telefone || "---"}</Text>
-        </View>
+      {/* SECÇÃO: GESTÃO (DONO) */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Anfitrião</Text>
+        <MenuOption 
+          icon="ev-station" 
+          label="Meus Carregadores" 
+          color={Colors.primary}
+          onPress={() => navigation.navigate('MyChargers')} 
+        />
+        <MenuOption 
+          icon="calendar-clock" 
+          label="Histórico de Ganhos" 
+          onPress={() => navigation.navigate('History', { mode: 'host' })} 
+        />
       </View>
 
-      <TouchableOpacity 
-        style={styles.primaryButton} 
-        onPress={() => navigation.navigate('AddCharger')}
-      >
-        <Text style={styles.buttonText}>Adicionar Carregador</Text>
-      </TouchableOpacity>
+      {/* SECÇÃO: UTILIZAÇÃO (CONDUTOR) */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Condutor</Text>
+        <MenuOption 
+          icon="history" 
+          label="Histórico de Carregamentos" 
+          onPress={() => navigation.navigate('History', { mode: 'driver' })} 
+        />
+        <MenuOption 
+          icon="credit-card-outline" 
+          label="Pagamentos e Faturação" 
+          onPress={() => {}} 
+        />
+      </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={[styles.buttonText, { color: Colors.danger }]}>Terminar Sessão</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
+      {/* SECÇÃO: CONFIGURAÇÕES */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Apoio</Text>
+        <MenuOption icon="cog-outline" label="Configurações" onPress={() => {}} />
+        <MenuOption 
+          icon="logout" 
+          label="Sair da Conta" 
+          color={Colors.danger} 
+          onPress={logout} 
+        />
+      </View>
+    </ScrollView>
   );
 };
 

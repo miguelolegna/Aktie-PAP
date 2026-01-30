@@ -1,37 +1,28 @@
 import 'dotenv/config';
-console.log("DEBUG: Chave detetada ->", process.env.GOOGLE_MAPS_API_KEY ? "SIM" : "NÃO");
+
 export default {
   expo: {
     name: "Aktie",
     slug: "Aktie",
     version: "1.0.0",
-    orientation: "portrait",
-    icon: "./assets/logos/simpler_logo_vector.svg",
+    // Icon principal (iOS/Expo Go)
+    icon: "./assets/icon.png", 
     userInterfaceStyle: "light",
     newArchEnabled: true,
+    
     splash: {
-      image: "./assets/splash-icon.png",
+      image: "./assets/logos/adaptive-icon.png", 
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
-    extra: {
-      eas: {
-        projectId: "7896334b-67ff-4283-a517-e1dda62e27bd"
-      }
-    },
-    ios: {
-      supportsTablet: true,
-      bundleIdentifier: "com.miguell.aktie",
-      config: {
-        googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY
-      }
-    },
+
     android: {
+      package: "com.miguell.aktie",
+      largeHeap: true, // Corrigido: Mantido apenas uma vez
       adaptiveIcon: {
         foregroundImage: "./assets/logos/adaptive-icon.png",
         backgroundColor: "#ffffff"
       },
-      package: "com.miguell.aktie", // Deve coincidir com a restrição na Google Cloud
       config: {
         googleMaps: {
           apiKey: process.env.GOOGLE_MAPS_API_KEY
@@ -40,9 +31,11 @@ export default {
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false
     },
+
     web: {
       favicon: "./assets/logos/adaptive-icon.png"
     },
+
     plugins: [
       "expo-video",
       "expo-asset",
@@ -53,6 +46,13 @@ export default {
           "locationAlwaysAndWhenInUsePermission": "Permite que a Aktie aceda à tua localização para encontrar postos próximos."
         }
       ]
-    ]
+    ],
+
+    // CORREÇÃO: O bloco extra deve estar aqui, fora de 'android'
+    extra: {
+      eas: {
+        projectId: "7896334b-67ff-4283-a517-e1dda62e27bd"
+      }
+    }
   }
 };
